@@ -11,11 +11,11 @@ Author: Nido Marianna
 # Librerie utilizzate
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sb
+import time
 
 # Variabili utili
-original_file_loc = "data_by_genres.csv"
-new_file_loc = "excerpt_data_by_genres.csv"
+original_file_loc = "C:/Users/maria/Desktop/FeelMusic/datasetUtils/data_by_genres.csv"
+new_file_loc = "C:/Users/maria/Desktop/FeelMusic/datasetUtils/excerpt_data_by_genres.csv"
 main_class_genres = [["classical", "Classical Music"],
                      ["comedy", "Comic Sketch"],
                      ["country", "Country Music"],
@@ -69,8 +69,8 @@ def adapt_dataset(dataset, classes):
     for gen, cat in classes:
         temp = pd.DataFrame()
 
-        res = pd.DataFrame(dataset[dataset['genres'].str.contains(gen)])
-        temp = pd.concat([temp, res], ignore_index=True)
+        result = pd.DataFrame(dataset[dataset['genres'].str.contains(gen)])
+        temp = pd.concat([temp, result], ignore_index=True)
 
         # Sostituzione del genere
         temp.loc[temp['genres'].str.contains(gen), 'genres'] = cat
@@ -154,20 +154,38 @@ def info_dataset(dataset):
     :param dataset -> Dataset di cui si vogliono conoscere le informazioni
     """
 
-    print("\t### Ecco alcune informazioni riguardanti il tuo dataset ###\n")
+    print("\t### Ecco alcune informazioni riguardanti il dataset acquisito ###\n")
     print("Elementi totali contenuti nel dataset: " + str(len(dataset)) + ".")
     print("------------------------------------------------------------------")
-    print("Le features del tuo dataset:\n\t#" + "\n\t#".join(list(dataset.columns)) + ".")
+
+    print("Le features del dataset:\n\t#" + "\n\t#".join(list(dataset.columns)) + ".")
     print("------------------------------------------------------------------")
+
     print("...Apertura istogramma con elementi relativi ad ogni macro classe individuata...")
     plt.subplots(num="Istogramma Classi/Num elementi")
     plt.hist(dataset['genres'], len(main_class_genres), color='purple', edgecolor='black')
+    time.sleep(2)
     plt.show()
     print("------------------------------------------------------------------")
+
     print("Categorie in cui sono stati riformattati i valori:\n"
           "\tVery Low  -> 1\n\tLow       -> 2\n\tMedium    -> 3\n\tHigh      -> 4\n\tVery High -> 5")
     print("------------------------------------------------------------------")
 
 
-data = retrieve_data()
-info_dataset(data)
+def split_dataset(dataset):
+    """
+    Funzione che divide il dataset in feature di input e feature di output
+    ---------------------------------------------------------------------------------------------------------
+    :param dataset -> Dataset da dividere
+    :return input_features -> Features di input, in questo caso le caratteristiche dei generi
+    :return output_features -> Features di output, in questo caso i generi da predire
+    """
+
+    input_features = dataset.iloc[:, 1:].values
+    output_features = dataset.iloc[:, 0].values
+
+    return input_features, output_features
+
+
+# info_dataset(retrieve_data())
