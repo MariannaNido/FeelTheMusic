@@ -12,13 +12,14 @@ from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 import seaborn as sns
 
 
-def show_confusion_matrix(model, y_values_true, y_values_pred):
+def show_confusion_matrix(model, y_values_true, y_values_pred, label):
     """
     Funzione che mostra la Matrice di Confusione per il modello dato.
     ---------------------------------------------------------------------------------------------------------
         :param model -> Il modello da valutare
         :param y_values_true -> Valori reali
         :param y_values_pred -> Valori predetti
+        :param label -> Etichetta per il modello che si sta valutando
     """
     """
     cm = confusion_matrix(y_true=y_values_true, y_pred=y_values_pred, labels=model.classes_)
@@ -28,18 +29,19 @@ def show_confusion_matrix(model, y_values_true, y_values_pred):
     plt.xticks(np.arange(len(model.classes_)), model.classes_)
     plt.show()
     """
+    matrix_title = str(label) + " Confusion Matrix"
 
     matrix = confusion_matrix(y_true=y_values_true, y_pred=y_values_pred, labels=model.classes_)
     plt.figure(figsize=(6, 4))
     sns.heatmap(matrix,
-                cmap='cool', #twilight
+                cmap='twilight_shifted',
                 linecolor='black',
                 linewidths=1,
                 xticklabels=model.classes_,
                 yticklabels=model.classes_,
                 annot=True,
                 fmt='d')
-    #plt.title('Confusion Matrix')
+    plt.title(matrix_title)
     plt.ylabel('True Label')
     plt.xlabel('Predicted Label')
     plt.xticks(np.arange(len(model.classes_)), model.classes_, rotation=20)

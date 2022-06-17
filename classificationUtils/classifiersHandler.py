@@ -15,6 +15,7 @@ import time
 from datasetUtils import datasetHandler
 from sklearn import neighbors
 from sklearn.naive_bayes import GaussianNB
+from sklearn.naive_bayes import CategoricalNB
 from sklearn import svm
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import classification_report
@@ -87,11 +88,12 @@ def decision_tree(dataset, max_depth):
     return model
 
 
-def model_metrics(model, dataset):
+def model_metrics(model, label, dataset):
     """
     Funzione che stampa il Classification Report e la Matrice di Confusione per il modello passato in input.
     ---------------------------------------------------------------------------------------------------------
         :param model -> Modello di cui si vogliono conoscere le metriche
+        :param label -> Etichetta per il modello che si sta valutando
         :param dataset -> Il dataset su cui lavorare
     """
 
@@ -99,14 +101,28 @@ def model_metrics(model, dataset):
 
     prediction = model.predict(x)
 
-    print("\n------------------------------------------------------------------")
-    print("### Classification report ###\n")
+    print("### " + str(label) + " Classification report ###\n")
     time.sleep(2)
     print(classification_report(y_true=y, y_pred=prediction, zero_division=0))
-    print("------------------------------------------------------------------")
 
     print("...Generazione della Confusion Matrix...")
     time.sleep(2)
-    fh.show_confusion_matrix(model, y, prediction)
-    print("------------------------------------------------------------------")
+    fh.show_confusion_matrix(model, y, prediction, label)
+    print("-----------------------------------------------------------------------------------------------------------------")
 
+
+# Forse (accuracy 50%)
+def categorical_naive_bayes(dataset):
+    """
+    Funzione che applica sul dataset l'algoritmo Categorical Naive Bayes, e ne ritorna il modello addestrato,
+    pronto per effettuare predizioni.
+    ---------------------------------------------------------------------------------------------------------
+        :param dataset -> Dataset
+        :return model -> Il modello addestrato sul dataset
+    """
+
+    x, y = datasetHandler.split_dataset(dataset)
+    cnb = CategoricalNB()
+    model = cnb.fit(x, y)
+
+    return model

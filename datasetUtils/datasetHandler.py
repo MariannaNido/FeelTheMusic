@@ -185,7 +185,7 @@ def info_dataset(dataset):
     print("Categorie in cui sono stati riformattati i valori:\n"
           "\tVery Low  -> 1\n\tLow       -> 2\n\tMedium    -> 3\n\tHigh      -> 4\n\tVery High -> 5")
     print("------------------------------------------------------------------")
-    time.sleep(1)
+    time.sleep(2)
 
 
 def split_dataset(dataset):
