@@ -11,14 +11,14 @@ Author: Nido Marianna
 """
 
 # Librerie utilizzate
-import matplotlib.pyplot as plt
 import time
 from datasetUtils import datasetHandler
 from sklearn import neighbors
 from sklearn.naive_bayes import GaussianNB
 from sklearn import svm
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import classification_report, confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import classification_report
+from figureUtils import figureHandler as fh
 
 
 def k_nearest_neighbors(dataset, n_neighbors):
@@ -87,29 +87,26 @@ def decision_tree(dataset, max_depth):
     return model
 
 
-def model_evaluation(model, prediction, dataset):
+def model_metrics(model, dataset):
     """
     Funzione che stampa il Classification Report e la Matrice di Confusione per il modello passato in input.
     ---------------------------------------------------------------------------------------------------------
         :param model -> Modello di cui si vogliono conoscere le metriche
-        :param prediction -> La predizione effettuata dal modello
-        :param dataset -> Il dataset da cui estrarre le feature di output
+        :param dataset -> Il dataset su cui lavorare
     """
 
-    x, true_dataset = datasetHandler.split_dataset(dataset)
+    x, y = datasetHandler.split_dataset(dataset)
 
+    prediction = model.predict(x)
+
+    print("\n------------------------------------------------------------------")
     print("### Classification report ###\n")
     time.sleep(2)
-    print(classification_report(y_true=true_dataset, y_pred=prediction, zero_division=0))
+    print(classification_report(y_true=y, y_pred=prediction, zero_division=0))
     print("------------------------------------------------------------------")
 
-    print("### Generazione della Confusion Matrix ###")
+    print("...Generazione della Confusion Matrix...")
     time.sleep(2)
-    cm = confusion_matrix(y_true=true_dataset, y_pred=prediction, labels=model.classes_)
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=model.classes_)
-
-    disp.plot()
-    plt.title("Confusion Matrix")
-    plt.show()
+    fh.show_confusion_matrix(model, y, prediction)
     print("------------------------------------------------------------------")
 

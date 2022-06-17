@@ -10,26 +10,26 @@ Author: Nido Marianna
 
 # Librerie utilizzate
 import pandas as pd
-import matplotlib.pyplot as plt
 import time
+from figureUtils import figureHandler as fh
 
 # Variabili utili
 original_file_loc = "C:/Users/maria/Desktop/FeelMusic/datasetUtils/data_by_genres.csv"
 new_file_loc = "C:/Users/maria/Desktop/FeelMusic/datasetUtils/excerpt_data_by_genres.csv"
-main_class_genres = [["classical", "Classical Music"],
+main_class_genres = [["classical", "Classical"],
                      ["comedy", "Comic Sketch"],
-                     ["country", "Country Music"],
-                     ["dance", "Dance Music"],
-                     ["hip hop", "Hip Hop Music"],
-                     ["indie", "Indie Music"],
-                     ["jazz", "Jazz Music"],
-                     ["lo-fi", "Lo-Fi Music"],
-                     ["metal", "Metal Music"],
-                     ["pop", "Pop Music"],
-                     ["rap", "Rap/Trap Music"],
-                     ["reggae", "Reggae/Reggaeton Music"],
-                     ["rock", "Rock Music"],
-                     ["techno", "Techno Music"]]
+                     ["country", "Country"],
+                     ["dance", "Dance"],
+                     ["hip hop", "Hip Hop"],
+                     ["indie", "Indie"],
+                     ["jazz", "Jazz"],
+                     ["lo-fi", "Lo-Fi"],
+                     ["metal", "Metal"],
+                     ["pop", "Pop"],
+                     ["rap", "Rap/Trap"],
+                     ["reggae", "Reggae/Reggaeton"],
+                     ["rock", "Rock"],
+                     ["techno", "Techno"]]
 
 
 def load_raw_dataset():
@@ -39,6 +39,10 @@ def load_raw_dataset():
     ---------------------------------------------------------------------------------------------------------
         :return clear_dataset -> Dataset contenente solo le colonne (features) utili.
     """
+
+    print("### Acquisizione del dataset ###")
+    time.sleep(3)
+    print("------------------------------------------------------------------")
 
     raw_dataset = pd.read_csv(original_file_loc)
     clear_dataset = pd.DataFrame(raw_dataset.drop(columns=['duration_ms', 'liveness', 'key', 'mode', 'tempo']))
@@ -103,17 +107,19 @@ def categorize_feature(dataset, feature):
     """
 
     if str(feature) == 'popularity':
-        dataset.loc[(dataset[feature] >= 80) & (dataset[feature] <= 100), feature] = 5
-        dataset.loc[(dataset[feature] >= 60) & (dataset[feature] < 80), feature] = 4
-        dataset.loc[(dataset[feature] >= 40) & (dataset[feature] < 60), feature] = 3
-        dataset.loc[(dataset[feature] >= 20) & (dataset[feature] < 40), feature] = 2
         dataset.loc[(dataset[feature] >= 0) & (dataset[feature] < 20), feature] = 1
+        dataset.loc[(dataset[feature] >= 20) & (dataset[feature] < 40), feature] = 2
+        dataset.loc[(dataset[feature] >= 40) & (dataset[feature] < 60), feature] = 3
+        dataset.loc[(dataset[feature] >= 60) & (dataset[feature] < 80), feature] = 4
+        dataset.loc[(dataset[feature] >= 80) & (dataset[feature] <= 100), feature] = 5
+
     elif str(feature) == 'loudness':
         dataset.loc[(dataset[feature] >= -8) & (dataset[feature] <= 0), feature] = 5
         dataset.loc[(dataset[feature] >= -16) & (dataset[feature] < -8), feature] = 4
         dataset.loc[(dataset[feature] >= -24) & (dataset[feature] < -16), feature] = 3
         dataset.loc[(dataset[feature] >= -32) & (dataset[feature] < -24), feature] = 2
         dataset.loc[(dataset[feature] >= -40) & (dataset[feature] < -32), feature] = 1
+
     else:
         dataset.loc[(dataset[feature] >= 0.8) & (dataset[feature] <= 1), feature] = 5
         dataset.loc[(dataset[feature] >= 0.6) & (dataset[feature] < 0.8), feature] = 4
@@ -140,6 +146,7 @@ def retrieve_data():
     ---------------------------------------------------------------------------------------------------------
     :return dataset -> Dataset pronto per essere utilizzato
     """
+
     raw = load_raw_dataset()
     dataset = adapt_dataset(raw, main_class_genres)
     save_dataset(dataset, new_file_loc)
@@ -151,31 +158,39 @@ def info_dataset(dataset):
     """
     Funzione che stampa alcune informazioni sul dataset che si utilizza
     ---------------------------------------------------------------------------------------------------------
-    :param dataset -> Dataset di cui si vogliono conoscere le informazioni
+        :param dataset -> Dataset di cui si vogliono conoscere le informazioni
     """
 
     print("\t### Ecco alcune informazioni riguardanti il dataset acquisito ###\n")
+    time.sleep(1)
+
     print("Elementi totali contenuti nel dataset: " + str(len(dataset)) + ".")
     print("------------------------------------------------------------------")
+    time.sleep(1)
 
-    print("Le features del dataset:\n\t#" + "\n\t#".join(list(dataset.columns)) + ".")
+    print("Le features del dataset:\n\t#" + "\n\t#".join(list(dataset.columns)))
     print("------------------------------------------------------------------")
+    time.sleep(1)
 
-    print("...Apertura istogramma con elementi relativi ad ogni macro classe individuata...")
-    plt.subplots(num="Istogramma Classi/Num elementi")
-    plt.hist(dataset['genres'], len(main_class_genres), color='purple', edgecolor='black')
-    time.sleep(2)
-    plt.show()
+    print("Numero di elementi per ogni macro classe:")
+    for c, v in zip(get_macro_classes_names(main_class_genres), get_count_for_classes(dataset)):
+        print("\t" + str(c) + " -> " + str(v))
+    time.sleep(1)
+
+    print("\n...Apertura istogramma con elementi relativi ad ogni macro classe individuata...")
+    fh.show_histogram(get_macro_classes_names(main_class_genres), get_count_for_classes(dataset))
     print("------------------------------------------------------------------")
+    time.sleep(1)
 
     print("Categorie in cui sono stati riformattati i valori:\n"
           "\tVery Low  -> 1\n\tLow       -> 2\n\tMedium    -> 3\n\tHigh      -> 4\n\tVery High -> 5")
     print("------------------------------------------------------------------")
+    time.sleep(1)
 
 
 def split_dataset(dataset):
     """
-    Funzione che divide il dataset in feature di input e feature di output
+    Funzione che divide il dataset in feature di input e feature di output.
     ---------------------------------------------------------------------------------------------------------
     :param dataset -> Dataset da dividere
     :return input_features -> Features di input, in questo caso le caratteristiche dei generi
@@ -188,4 +203,35 @@ def split_dataset(dataset):
     return input_features, output_features
 
 
-# info_dataset(retrieve_data())
+def get_count_for_classes(dataset):
+    """
+    Funzione che conta gli elementi per ogni macro classe nel dataset.
+    ---------------------------------------------------------------------------------------------------------
+        :param dataset -> Dataset da cui ricavare i valori
+        :return values -> Valori per ogni macro classe
+    """
+
+    values = []
+    grouped = dataset.groupby('genres').count()['acousticness']
+    # Possiamo usare una feature qualunque al posto di 'acousticness', dato che il conteggio resta uguale
+
+    for i in range(len(grouped)):
+        values.append(grouped[i])
+
+    return values
+
+
+def get_macro_classes_names(macro_classes):
+    """
+    Funzione che recupera le "etichette" delle macro classi individuate.
+    ---------------------------------------------------------------------------------------------------------
+        :param macro_classes -> Macro classi con generi
+        :return classes -> Etichette delle macro classi
+    """
+
+    classes = []
+
+    for i in range(len(macro_classes)):
+        classes.append(macro_classes[i][1])
+
+    return classes
