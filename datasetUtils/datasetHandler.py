@@ -14,8 +14,8 @@ import time
 from figureUtils import figureHandler as fh
 
 # Variabili utili
-original_file_loc = "C:/Users/maria/Desktop/FeelMusic/datasetUtils/data_by_genres.csv"
-new_file_loc = "C:/Users/maria/Desktop/FeelMusic/datasetUtils/excerpt_data_by_genres.csv"
+original_file_loc = r"./../datasetUtils/data_by_genres.csv"
+new_file_loc = r"./../datasetUtils/excerpt_data_by_genres.csv"
 main_class_genres = [["classical", "Classical"],
                      ["comedy", "Comic Sketch"],
                      ["country", "Country"],
