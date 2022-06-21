@@ -34,7 +34,7 @@ def show_confusion_matrix(model, y_values_true, y_values_pred, label):
     matrix = confusion_matrix(y_true=y_values_true, y_pred=y_values_pred, labels=model.classes_)
     plt.figure(figsize=(6, 4))
     sns.heatmap(matrix,
-                cmap='twilight_shifted',
+                cmap='YlGn',
                 linecolor='black',
                 linewidths=1,
                 xticklabels=model.classes_,
@@ -57,7 +57,7 @@ def show_histogram(classes, values):
     """
 
     plt.subplots(num="Istogramma Classi/Num elementi")
-    plt.bar(classes, values, color='#003b6f', edgecolor='black')
+    plt.bar(classes, values, color='#1DB954', edgecolor='black')
     plt.xticks(np.arange(len(classes)), rotation=20)
     plt.show()
 

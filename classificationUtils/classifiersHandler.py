@@ -4,7 +4,7 @@ File Name: classifiersHandler.py
 Utility: Python file contenente funzioni utili alla classificazione.
          In particolare, si è deciso di utilizzare i seguenti classificatori:
             - K-Nearest Neighbor
-            - Gaussian Naive Bayes
+            - Gaussian Naive Bayes (oppure Categorical Naive Bayes)
             - Support Vector Machine, nello specifico SVC (Support Vector Classification)
             - Decision Tree
 Author: Nido Marianna
@@ -109,6 +109,19 @@ def model_metrics(model, label, dataset):
     time.sleep(2)
     fh.show_confusion_matrix(model, y, prediction, label)
     print("-----------------------------------------------------------------------------------------------------------------")
+
+
+def kfold_cross_valid(dataset, k, model):
+
+    from sklearn.model_selection import KFold, cross_val_score
+
+    x, y = datasetHandler.split_dataset(dataset)
+    kf = KFold(n_splits=k, random_state=1, shuffle=True)
+
+    result = cross_val_score(model, x, y, cv=kf)
+    print(result.mean())
+
+
 
 
 # Forse (accuracy 50%)
