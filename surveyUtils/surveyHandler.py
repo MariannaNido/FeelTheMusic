@@ -39,7 +39,7 @@ answers = [
      "5. Di spegnere i pensieri per un po\', e lasciarmi trasportare da brani ad alto volume\n"],
     ["1. Brani per niente conosciuti\n", "2. Brani poco conosciuti\n", "3. Qualsiasi tipo di brano va bene\n",
      "4. Tendo a scegliere brani spesso già sentiti\n", "5. Se un brano non è tra i più ascoltati, non fa per me\n"],
-    ["1. Traccia contenente più cantato che parlato\n", "2. Traccia contenente solo cantato\n",
+    ["1. Traccia contenente solo cantato\n", "2. Traccia contenente più cantato che parlato\n",
      "3. Il bilanciamento tra parlato e cantato sarebbe indifferente (es: musica rap)\n",
      "4. Traccia contenente più parlato che cantato\n", "5. Traccia contenente solo parlato (es: talk show)\n"],
     ["1. Non sono proprio dell\'umore giusto\n", "2. Non sono al settimo cielo, però neanche troppo giù di morale\n",
@@ -80,6 +80,6 @@ def start_survey():
         print("---------------------------------------------------")
 
     print("FINE DEL QUESTIONARIO")
-    print("-----------------------------------------------------------------------------------------------------------------\n")
+    print("-----------------------------------------------------------------------------------------------------------------")
 
     return user_answers
