@@ -4,22 +4,23 @@ File Name: classifiersHandler.py
 Utility: Python file contenente funzioni utili alla classificazione.
          In particolare, si è deciso di utilizzare i seguenti classificatori:
             - K-Nearest Neighbor
-            - Gaussian Naive Bayes (oppure Categorical Naive Bayes)
+            - Gaussian Naive Bayes
             - Support Vector Machine, nello specifico SVC (Support Vector Classification)
-            - Decision Tree
+            - Decision Tree (Classification Tree)
 Author: Nido Marianna
 """
 
 # Librerie utilizzate
 import time
 from datasetUtils import datasetHandler
+from figureUtils import figureHandler
 from sklearn import neighbors
 from sklearn.naive_bayes import GaussianNB
-from sklearn.naive_bayes import CategoricalNB
 from sklearn import svm
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import classification_report
-from figureUtils import figureHandler as fh
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import StratifiedKFold, cross_val_predict
+from sklearn.metrics import classification_report, accuracy_score, precision_score, recall_score, f1_score
 
 
 def k_nearest_neighbors(dataset, n_neighbors):
@@ -74,7 +75,7 @@ def support_vector_machine(dataset):
 def decision_tree(dataset, max_depth):
     """
     Funzione che applica sul dataset l'algoritmo Decision Tree, e ne ritorna il modello addestrato,
-    pronto per effettuare predizioni.
+    pronto per effettuare predizioni. In questo caso, si parla di Classification Tree.
     ---------------------------------------------------------------------------------------------------------
         :param dataset -> Dataset
         :param max_depth -> Profondità massima del Decision Tree
@@ -82,60 +83,67 @@ def decision_tree(dataset, max_depth):
     """
 
     x, y = datasetHandler.split_dataset(dataset)
-    tree = DecisionTreeClassifier(criterion='entropy', random_state=0, max_depth=max_depth)
+    tree = DecisionTreeClassifier(random_state=0, max_depth=max_depth)
     model = tree.fit(x, y)
 
     return model
 
 
-def model_metrics(model, label, dataset):
+def random_forest(dataset, max_depth):
     """
-    Funzione che stampa il Classification Report e la Matrice di Confusione per il modello passato in input.
-    ---------------------------------------------------------------------------------------------------------
-        :param model -> Modello di cui si vogliono conoscere le metriche
-        :param label -> Etichetta per il modello che si sta valutando
-        :param dataset -> Il dataset su cui lavorare
-    """
-
-    x, y = datasetHandler.split_dataset(dataset)
-
-    prediction = model.predict(x)
-
-    print("### " + str(label) + " Classification report ###\n")
-    time.sleep(2)
-    print(classification_report(y_true=y, y_pred=prediction, zero_division=0))
-
-    print("...Generazione della Confusion Matrix...")
-    time.sleep(2)
-    fh.show_confusion_matrix(model, y, prediction, label)
-    print("-----------------------------------------------------------------------------------------------------------------")
-
-
-def kfold_cross_valid(dataset, k, model):
-
-    from sklearn.model_selection import KFold, cross_val_score
-
-    x, y = datasetHandler.split_dataset(dataset)
-    kf = KFold(n_splits=k, random_state=1, shuffle=True)
-
-    result = cross_val_score(model, x, y, cv=kf)
-    print(result.mean())
-
-
-
-
-# Forse (accuracy 50%)
-def categorical_naive_bayes(dataset):
-    """
-    Funzione che applica sul dataset l'algoritmo Categorical Naive Bayes, e ne ritorna il modello addestrato,
-    pronto per effettuare predizioni.
+    Funzione che applica sul dataset l'algoritmo Random Forest, e ne ritorna il modello addestrato,
+    pronto per effettuare predizioni. In questo caso, si parla di Random Forest Classifier.
     ---------------------------------------------------------------------------------------------------------
         :param dataset -> Dataset
+        :param max_depth -> Profondità massima del Random Forest
         :return model -> Il modello addestrato sul dataset
     """
 
     x, y = datasetHandler.split_dataset(dataset)
-    cnb = CategoricalNB()
-    model = cnb.fit(x, y)
+    rtree = RandomForestClassifier(random_state=0, max_depth=max_depth)
+    model = rtree.fit(x, y)
 
     return model
+
+
+def model_eval_metrics(model, label, dataset, cv_splits):
+    """
+    Funzione che stampa le metriche per la valutazione del modello in input. Nello specifico, stampa il
+    classification report e la confusion matrix per documentazione e, singolarmente, accuracy, precision,
+    recall, f1-score.
+    La funzione fa uso della Stratified k-Fold Cross Validation per valutare il modello.
+    ---------------------------------------------------------------------------------------------------------
+        :param model -> Modello di cui si vogliono conoscere le metriche
+        :param label -> Etichetta per il modello che si sta valutando
+        :param dataset -> Il dataset su cui lavorare
+        :param cv_splits -> Numero di splits per la k-Fold Cross Validation
+    """
+
+    kf = StratifiedKFold(n_splits=cv_splits, random_state=1, shuffle=True)
+
+    x, y = datasetHandler.split_dataset(dataset)
+
+    prediction = cross_val_predict(estimator=model, X=x, y=y, cv=kf)
+
+    print("### Metriche per classificatore " + str(label) + " ###\n")
+
+    # Stampa classification report e confusion matrix
+    print("## " + str(label) + " Classification report ##\n")
+    print(classification_report(y_true=y, y_pred=prediction, zero_division=0))
+    print("-----------------------------------------------------------------------------------------------------------------")
+    time.sleep(2)
+
+    print("...Generazione della Confusion Matrix...")
+    time.sleep(1)
+    figureHandler.show_confusion_matrix(model, y, prediction, label)
+    print("-----------------------------------------------------------------------------------------------------------------")
+    time.sleep(2)
+
+    # Stampa metriche singolarmente
+    print("## Singole metriche ##")
+    print("\t#Accuracy -> ", accuracy_score(y_true=y, y_pred=prediction))
+    print("\t#Precision -> ", precision_score(y_true=y, y_pred=prediction, average='macro', zero_division=0))
+    print("\t#Recall -> ", recall_score(y_true=y, y_pred=prediction, average='macro', zero_division=0))
+    print("\t#F1-Score -> ", f1_score(y_true=y, y_pred=prediction, average='macro', zero_division=0))
+    print("-----------------------------------------------------------------------------------------------------------------")
+    time.sleep(2)

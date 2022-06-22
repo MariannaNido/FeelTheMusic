@@ -8,7 +8,7 @@ Author: Nido Marianna
 # Librerie utilizzate
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import confusion_matrix
 import seaborn as sns
 
 
@@ -21,14 +21,7 @@ def show_confusion_matrix(model, y_values_true, y_values_pred, label):
         :param y_values_pred -> Valori predetti
         :param label -> Etichetta per il modello che si sta valutando
     """
-    """
-    cm = confusion_matrix(y_true=y_values_true, y_pred=y_values_pred, labels=model.classes_)
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=model.classes_)
 
-    disp.plot()
-    plt.xticks(np.arange(len(model.classes_)), model.classes_)
-    plt.show()
-    """
     matrix_title = str(label) + " Confusion Matrix"
 
     matrix = confusion_matrix(y_true=y_values_true, y_pred=y_values_pred, labels=model.classes_)
